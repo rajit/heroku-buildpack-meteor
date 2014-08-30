@@ -17,14 +17,18 @@ fetch_meteor() {
   fi
 
 
-  PACKAGE=meteor_${METEOR_VERSION}-1_amd64.deb
+  #PACKAGE=meteor_${METEOR_VERSION}-1_amd64.deb
 
-  echo "Fetching meteor deb package"
-  curl -o "$CACHE_DIR/$PACKAGE" "https://github.com/meteor/meteor/releases/tag/release%2FMETEOR%400.9.1-rc2"
+  echo "Installting meteor Package"
+  curl https://install.meteor.com/ | sh
 
-  echo "Unpacking meteor"
-  [ ! -d "$METEOR_HOME" ] && mkdir -p "$METEOR_HOME"
-  ar p "$CACHE_DIR/$PACKAGE" data.tar.gz | tar -C "$METEOR_HOME" -zxf -
+  echo "Updating PATH with METEOR"
+  PATH=$HOME/.meteor:$PATH
+  cp "$LAUNCHER" /usr/bin/meteor
+
+  #echo "Unpacking meteor"
+  #[ ! -d "$METEOR_HOME" ] && mkdir -p "$METEOR_HOME"
+  #ar p "$CACHE_DIR/$PACKAGE" data.tar.gz | tar -C "$METEOR_HOME" -zxf -
 }
 
 build() {
