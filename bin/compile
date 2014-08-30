@@ -22,9 +22,9 @@ fetch_meteor() {
   echo "Fetching meteor deb package"
   curl -o "$CACHE_DIR/$PACKAGE" "https://install.meteor.com" | /bin/sh
 
-  #echo "Unpacking meteor"
-  #[ ! -d "$METEOR_HOME" ] && mkdir -p "$METEOR_HOME"
-  #ar p "$CACHE_DIR/$PACKAGE" data.tar.gz | tar -C "$METEOR_HOME" -zxf -
+  echo "Unpacking meteor"
+  [ ! -d "$METEOR_HOME" ] && mkdir -p "$METEOR_HOME"
+  ar p "$CACHE_DIR/$PACKAGE" data.tar.gz | tar -C "$METEOR_HOME" -zxf -
 }
 
 build() {
