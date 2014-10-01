@@ -5,11 +5,17 @@ CACHE_DIR=$2
 METEOR_HOME=$BUILD_DIR/.meteor/local
 PATH=$METEOR_HOME/usr/bin:$METEOR_HOME/usr/lib/meteor/bin:$PATH
 
+echo "build dir = " $BUILD_DIR
+echo "cache dir = " $CACHE_DIR
+echo "meteor home = " $METEOR_HOME
+echo "path = " $PATH
+
+
 fetch_meteor() {
-  if [ -f "$METEOR_HOME/usr/bin/meteor" ] ; then
+  #if [ -f "$METEOR_HOME/usr/bin/meteor" ] ; then
     # Skip if meteor is already fetched
-    return
-  fi
+    #return
+  #fi
   
   # Download node from Heroku's S3 mirror of nodejs.org/dist
   status "Downloading and installing node"
@@ -18,7 +24,6 @@ fetch_meteor() {
   
   # Move node (and npm) into ./vendor and make them executable
   mkdir -p $BUILD_DIR/vendor
-  echo "build dir = " $BUILD_DIR
   mv $BUILD_DIR/node-v$node_version-linux-x64 $BUILD_DIR/vendor/node
   chmod +x $BUILD_DIR/vendor/node/bin/*
   PATH=$BUILD_DIR/vendor/node/bin:$PATH
