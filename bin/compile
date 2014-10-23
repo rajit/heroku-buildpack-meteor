@@ -4,6 +4,7 @@ BUILD_DIR=$1
 CACHE_DIR=$2
 METEOR_HOME=$BUILD_DIR/.meteor/local
 PATH=$METEOR_HOME/usr/bin:$METEOR_HOME/usr/lib/meteor/bin:$PATH
+node_version=0.10.32
 
 echo "build dir = $BUILD_DIR"
 echo "cache dir = $CACHE_DIR"
