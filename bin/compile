@@ -23,7 +23,7 @@ fetch_meteor() {
   #fi
   
   # Download node from Heroku's S3 mirror of nodejs.org/dist
-  status "Downloading and installing node"
+  status "Downloading and installing node $node_version"
   NODE_URL="http://s3pository.heroku.com/node/v$node_version/node-v$node_version-linux-x64.tar.gz"
   curl $NODE_URL -s -o - | tar xzf - -C $BUILD_DIR
   
@@ -48,7 +48,7 @@ build() {
     cd deploy/bundle/programs/server
     echo "Installing npm dependencies"
     npm install
-    mv .vendor vendor
+    mv $BUILD_DIR/.vendor $BUILD_DIR/vendor
   )
 }
 
