@@ -33,7 +33,7 @@ fetch_meteor() {
   chmod +x $BUILD_DIR/.vendor/node/bin/*
   PATH=$BUILD_DIR/.vendor/node/bin:$PATH
 
-  status "Installting meteor Package"
+  status "Installing meteor Package"
   curl https://install.meteor.com/ | sh
 
   status "Updating PATH with METEOR"
