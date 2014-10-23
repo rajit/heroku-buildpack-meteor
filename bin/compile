@@ -33,20 +33,20 @@ fetch_meteor() {
   chmod +x $BUILD_DIR/.vendor/node/bin/*
   PATH=$BUILD_DIR/.vendor/node/bin:$PATH
 
-  echo "Installting meteor Package"
+  status "Installting meteor Package"
   curl https://install.meteor.com/ | sh
 
-  echo "Updating PATH with METEOR"
+  status "Updating PATH with METEOR"
   PATH=$HOME/.meteor:$PATH
 }
 
 build() {
   ( 
     cd $BUILD_DIR
-    echo "Building meteor bundle"
+    status "Building meteor bundle"
     meteor build --directory deploy
     cd deploy/bundle/programs/server
-    echo "Installing npm dependencies"
+    status "Installing npm dependencies"
     npm install
     mv $BUILD_DIR/.vendor $BUILD_DIR/vendor
   )
@@ -58,9 +58,9 @@ build() {
 fetch_meteor
 build
 
-echo "Checking for post_compile script"
+status "Checking for post_compile script"
 if [ -f $BUILD_DIR/bin/post_compile ] ; then
-    echo "-----> Running post_compile hook"
+    status "Running post_compile hook"
     chmod +x $BUILD_DIR/bin/post_compile
     $BUILD_DIR/bin/post_compile
 fi
