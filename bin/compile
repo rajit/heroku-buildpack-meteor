@@ -4,14 +4,16 @@ BUILD_DIR=$1
 CACHE_DIR=$2
 METEOR_HOME=$BUILD_DIR/.meteor/local
 PATH=$METEOR_HOME/usr/bin:$METEOR_HOME/usr/lib/meteor/bin:$PATH
-bp_dir=$(cd $(dirname $0); cd ..; pwd)
 
 echo "build dir = $BUILD_DIR"
 echo "cache dir = $CACHE_DIR"
 echo "meteor home = $METEOR_HOME"
 echo "path = $PATH"
 
-source $bp_dir/bin/common.sh
+status() {
+  echo "-----> $*"
+}
+
 node_version=$(curl --silent --get https://semver.io/node/resolve)
 
 fetch_meteor() {
