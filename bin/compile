@@ -41,7 +41,7 @@ build() {
     cd $BUILD_DIR
     echo "Building meteor bundle"
     meteor build --directory deploy
-    cd deploy 
+    cd deploy/bundle/programs/server
     echo "Installing npm dependencies"
     npm install
   )
