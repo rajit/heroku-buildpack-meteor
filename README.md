@@ -1,4 +1,4 @@
-# Heroku buildpack for meteor
+# Heroku buildpack for Meteor 0.9.0+
 
 ## Usage
 
