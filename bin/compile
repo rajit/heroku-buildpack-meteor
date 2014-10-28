@@ -10,6 +10,14 @@ echo "cache dir = $CACHE_DIR"
 echo "meteor home = $METEOR_HOME"
 echo "path = $PATH"
 
+indent() {
+  c='s/^/       /'
+  case $(uname) in
+    Darwin) sed -l "$c";; # mac/bsd sed: -l buffers on line boundaries
+    *)      sed -u "$c";; # unix/gnu sed: -u unbuffered (arbitrary) chunks of data
+  esac
+}
+
 status() {
   echo "-----> $*"
 }
@@ -34,7 +42,7 @@ fetch_meteor() {
   PATH=$BUILD_DIR/.vendor/node/bin:$PATH
 
   status "Installing meteor Package"
-  curl https://install.meteor.com/ | sh
+  curl https://install.meteor.com/ | sh | indent
 
   status "Updating PATH with METEOR"
   PATH=$HOME/.meteor:$PATH
@@ -44,10 +52,10 @@ build() {
   ( 
     cd $BUILD_DIR
     status "Building meteor bundle"
-    meteor build --directory deploy
+    meteor build --directory deploy | indent
     cd deploy/bundle/programs/server
     status "Installing npm dependencies"
-    npm install
+    npm install | indent
     mv $BUILD_DIR/.vendor $BUILD_DIR/vendor
   )
 }
