@@ -5,10 +5,10 @@ CACHE_DIR=$2
 METEOR_HOME=$BUILD_DIR/.meteor/local
 PATH=$METEOR_HOME/usr/bin:$METEOR_HOME/usr/lib/meteor/bin:$PATH
 
-echo "build dir = $BUILD_DIR"
-echo "cache dir = $CACHE_DIR"
-echo "meteor home = $METEOR_HOME"
-echo "path = $PATH"
+echo "build dir = $BUILD_DIR" | indent
+echo "cache dir = $CACHE_DIR" | indent
+echo "meteor home = $METEOR_HOME" | indent
+echo "path = $PATH" | indent
 
 indent() {
   c='s/^/       /'
@@ -42,7 +42,7 @@ fetch_meteor() {
   PATH=$BUILD_DIR/.vendor/node/bin:$PATH
 
   status "Installing meteor Package"
-  curl https://install.meteor.com/ | sh | indent
+  curl -s https://install.meteor.com/ | sh 2>&1 | indent
 
   status "Updating PATH with METEOR"
   PATH=$HOME/.meteor:$PATH
@@ -52,10 +52,10 @@ build() {
   ( 
     cd $BUILD_DIR
     status "Building meteor bundle"
-    meteor build --directory deploy | indent
+    meteor build --directory deploy 2>&1 | indent
     cd deploy/bundle/programs/server
     status "Installing npm dependencies"
-    npm install | indent
+    npm install 2>&1 | indent
     mv $BUILD_DIR/.vendor $BUILD_DIR/vendor
   )
 }
