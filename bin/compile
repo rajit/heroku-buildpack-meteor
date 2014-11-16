@@ -17,11 +17,6 @@ status() {
   echo "-----> $*"
 }
 
-echo "build dir = $BUILD_DIR" | indent
-echo "cache dir = $CACHE_DIR" | indent
-echo "meteor home = $METEOR_HOME" | indent
-echo "path = $PATH" | indent
-
 node_version=$(curl --silent --get https://semver.io/node/resolve)
 
 fetch_meteor() {
