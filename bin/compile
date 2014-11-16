@@ -2,7 +2,7 @@
 
 set -e            # fail fast
 # set -o pipefail   # don't ignore exit codes when piping output
-set -x          # enable debugging
+# set -x          # enable debugging
 
 # Configure directories
 build_dir=$1
@@ -15,6 +15,9 @@ unset GIT_DIR
 
 # Load some convenience functions like status(), echo(), and indent()
 source $bp_dir/bin/common.sh
+
+# Output npm debug info on error
+trap cat_npm_debug_log ERR
 
 # Resolve node version using semver.io
 node_version=$(curl --silent --get https://semver.io/node/resolve)
