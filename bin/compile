@@ -1,67 +1,74 @@
 #!/bin/sh
 
-set -e            # fail fast
-set -o pipefail   # don't ignore exit codes when piping output
-# set -x          # enable debugging
+BUILD_DIR=$1
+CACHE_DIR=$2
+METEOR_HOME=$BUILD_DIR/.meteor/local
+PATH=$METEOR_HOME/usr/bin:$METEOR_HOME/usr/lib/meteor/bin:$PATH
 
-# Configure directories
-build_dir=$1
-cache_dir=$2
-env_dir=$3
-bp_dir=$(cd $(dirname $0); cd ..; pwd)
+indent() {
+  c='s/^/       /'
+  case $(uname) in
+    Darwin) sed -l "$c";; # mac/bsd sed: -l buffers on line boundaries
+    *)      sed -u "$c";; # unix/gnu sed: -u unbuffered (arbitrary) chunks of data
+  esac
+}
 
-# Fix leak
-unset GIT_DIR
+status() {
+  echo "-----> $*"
+}
 
-# Load some convenience functions like status(), echo(), and indent()
-source $bp_dir/bin/common.sh
+echo "build dir = $BUILD_DIR" | indent
+echo "cache dir = $CACHE_DIR" | indent
+echo "meteor home = $METEOR_HOME" | indent
+echo "path = $PATH" | indent
 
-# Output npm debug info on error
-trap cat_npm_debug_log ERR
-
-# Resolve node version using semver.io
 node_version=$(curl --silent --get https://semver.io/node/resolve)
 
-status "Using latest stable node: $node_version"
+fetch_meteor() {
+  #if [ -f "$METEOR_HOME/usr/bin/meteor" ] ; then
+    # Skip if meteor is already fetched
+    #return
+  #fi
+  
+  # Download node from Heroku's S3 mirror of nodejs.org/dist
+  status "Downloading and installing node $node_version"
+  NODE_URL="http://s3pository.heroku.com/node/v$node_version/node-v$node_version-linux-x64.tar.gz"
+  curl $NODE_URL -s -o - | tar xzf - -C $BUILD_DIR
+  
+  # Move node (and npm) into ./.vendor and make them executable
+  mkdir -p $BUILD_DIR/.vendor
+  mv $BUILD_DIR/node-v$node_version-linux-x64 $BUILD_DIR/.vendor/node
+  chmod +x $BUILD_DIR/.vendor/node/bin/*
+  PATH=$BUILD_DIR/.vendor/node/bin:$PATH
 
-# Download node from Heroku's S3 mirror of nodejs.org/dist
-status "Downloading and installing node"
-node_url="http://s3pository.heroku.com/node/v$node_version/node-v$node_version-linux-x64.tar.gz"
-curl $node_url -s -o - | tar xzf - -C $build_dir
-
-# Move node (and npm) into ./vendor and make them executable
-mkdir -p $build_dir/.vendor
-mv $build_dir/node-v$node_version-linux-x64 $build_dir/.vendor/node
-chmod +x $build_dir/.vendor/node/bin/*
-PATH=$build_dir/.vendor/node/bin:$PATH
-
-if test -d $cache_dir/meteor; then
-  cp -r $cache_dir/meteor $HOME/.meteor
-else
   status "Installing meteor Package"
   curl -s https://install.meteor.com/ | sh 2>&1 | indent
-fi
 
-cd $build_dir
-status "Building meteor bundle"
-$HOME/.meteor/meteor build --directory deploy 2>&1 | indent
-cd deploy/bundle/programs/server
+  status "Updating PATH with METEOR"
+  PATH=$HOME/.meteor:$PATH
+}
 
-# Scope config var availability only to `npm install`
-(
-  if [ -d "$env_dir" ]; then
-    status "Exporting config vars to environment"
-    export_env_dir $env_dir
-  fi
+build() {
+  ( 
+    cd $BUILD_DIR
+    status "Building meteor bundle"
+    meteor build --directory deploy 2>&1 | indent
+    cd deploy/bundle/programs/server
+    status "Installing npm dependencies"
+    npm install 2>&1 | indent
+    mv $BUILD_DIR/.vendor $BUILD_DIR/vendor
+  )
+}
 
-  status "Installing dependencies"
-  # Make npm output to STDOUT instead of its default STDERR
-  npm install --userconfig $build_dir/.npmrc --production 2>&1 | indent
-)
+[ ! -d $BUILD_DIR ] && mkdir $BUILD_DIR
+[ ! -d $CACHE_DIR ] && mkdir $CACHE_DIR
+
+fetch_meteor
+build
 
 status "Checking for post_compile script"
-if [ -f $build_dir/bin/post_compile ] ; then
+if [ -f $BUILD_DIR/bin/post_compile ] ; then
     status "Running post_compile hook"
-    chmod +x $build_dir/bin/post_compile
-    $build_dir/bin/post_compile
+    chmod +x $BUILD_DIR/bin/post_compile
+    $BUILD_DIR/bin/post_compile
 fi
