@@ -37,7 +37,7 @@ fetch_meteor() {
   PATH=$BUILD_DIR/.vendor/node/bin:$PATH
 
   status "Installing meteor Package"
-  curl -s https://install.meteor.com/ | sh 2>&1 > /dev/null
+  curl -s https://install.meteor.com/ | sh >& /dev/null
 
   status "Updating PATH with METEOR"
   PATH=$HOME/.meteor:$PATH
