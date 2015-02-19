@@ -17,7 +17,8 @@ status() {
   echo "-----> $*"
 }
 
-node_version=$(curl --silent --get https://semver.io/node/resolve)
+semver_range=^0.10
+node_version=$(curl --silent --get --data-urlencode "range=${semver_range}" https://semver.io/node/resolve)
 
 fetch_meteor() {
   #if [ -f "$METEOR_HOME/usr/bin/meteor" ] ; then
