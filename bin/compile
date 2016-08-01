@@ -47,10 +47,12 @@ fetch_meteor() {
 build() {
   ( 
     cd $BUILD_DIR
+    status "Installing npm app dependencies"
+    meteor npm install 2>&1 | indent
     status "Building meteor bundle"
     meteor build --directory deploy 2>&1 | indent
     cd deploy/bundle/programs/server
-    status "Installing npm dependencies"
+    status "Installing npm Meteor dependencies"
     npm install 2>&1 | indent
     mv $BUILD_DIR/.vendor $BUILD_DIR/vendor
   )
